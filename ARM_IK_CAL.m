@@ -7,8 +7,8 @@ addpath('E:\Research\Research\0000_matlab_math_lib\code');
 % T是末端位姿
 % 测试用的零位T
 %{
-T_08 =[1.0000         0         0  668.000;
-         0         0    1.0000    9.0000;
+T_08 =[  0         0         1    9.000;
+         -1         0        0    -668.0000;
          0   -1.0000         0  158.3000;
          0         0         0    1.0000];
 %}
@@ -21,6 +21,9 @@ d_ew=256.9;
 a_wf=12;
 a_se=9;
 a_ee=39.5;
+
+% 对theta4进行限制
+theta4_max = 130/180*pi;
 
 T_08 = T;
 % 坐标系7的姿态和T_08一致，位置相差一个偏置,没带v认为是实际机械臂
@@ -56,7 +59,6 @@ theta4_up = beta1+pi-beta2;
 
 % 肩腕关节向量的单位向量
 vec_d_hat = vec_d/len_vec_d;
-
 % 参考向量
 vec_v_hat = [0,1,0]';
 
@@ -73,6 +75,8 @@ theta4_down = beta2-beta20;
 gamma_down = beta1-angle_ESW;
 
 gamma=gamma_down;
+% theta4 =theta4_up;
+theta4 =theta4_down;
 
 
 %表示x4
@@ -91,10 +95,9 @@ R_03 = R_0phi*R_03_v;
 % 这里根据正运动学可以反解出theta1，2，3
 theta2 = -asin(R_03(3,3));
 theta3 = atan(R_03(3,1)/R_03(3,2));
-theta1 = atan(R_03(2,3)/R_03(1,3));
+theta1 = atan(-R_03(1,3)/R_03(2,3));
 
-% theta4 =theta4_up;
-theta4 =theta4_down;
+
 
 
 
@@ -105,7 +108,7 @@ theta4 =theta4_down;
 
 
 % 至此，求出了theta1，2，3，4
-A1=modified_DH_transform(theta1+pi,d_bs,0,0);
+A1=modified_DH_transform(theta1+pi/2,d_bs,0,0);
 A2=modified_DH_transform(theta2-pi/2,0,0,pi/2);
 A3=modified_DH_transform(theta3+pi/2,d_se,0,pi/2);
 A4=modified_DH_transform(theta4,0,a_se,-pi/2);
@@ -170,7 +173,7 @@ vec_AC = vec_AC(1:3);
 l_m20=151.53;
 l_m30=151.53;
 
-delta2 = norm(vec_AC)-l_m20;
+delta2 = norm(vec_AC)-l_m20; % limb2
 
 P_7_D = [-d_cx,-d_cy,d_cz,1]'; % D点在7坐标系下的坐标
 P_5_D = T_57*P_7_D;
@@ -180,6 +183,9 @@ vec_ED = vec_ED(1:3);
 delta3 = norm(vec_ED)-l_m30;
 
 theta = [theta1,theta2,theta3,delta1,theta5,delta2,delta3];
+
+% 计算臂型角
+vec_h = vec_d_hat*dot(vec_d_hat,vec)
 
 
 end
