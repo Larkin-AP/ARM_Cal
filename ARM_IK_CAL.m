@@ -1,5 +1,5 @@
 % 整理过后的ARM_IK，这个需要输出正确的关节角度，符号对应整理的文档
-function theta = ARM_IK_CAL(T,phi)
+function theta = ARM_IK_CAL(T,theta7)
 addpath('E:\Research\Research\0000_matlab_math_lib\code');
 
 % theta 是所以电机的角度，theta = [theta1,theta2,theta3,delta_1,theta5,delta2,delta3];
@@ -24,6 +24,9 @@ a_ee=39.5;
 
 % 对theta4进行限制
 theta4_max = 130/180*pi;
+% phi=0;
+
+A7=modified_DH_transform(theta7,0,a_wf,pi/2);
 
 T_08 = T;
 % 坐标系7的姿态和T_08一致，位置相差一个偏置,没带v认为是实际机械臂
@@ -33,12 +36,19 @@ P_0_wa = T_08 * P_8_wa;
 T_07 = [R_08,P_0_wa(1:3);
     0,0,0,1];
 
+
+T_06 = T_07/(A7);
+P_0_wv = T_06(1:4,4); %这个就是以虚拟腕关节的在0坐标系下的坐标
+
+
+
+
 % 这个地方为了套用SRS，所以这里不用T_07
 % 这里把theta7a挪到theta7v，theta7v和theta6的原点重合，这里是虚拟的腕关节
-P_8_wv = [-a_ee-a_wf,0,0,1]';
-P_0_wv = T_08 * P_8_wv;
-T_07_v = [R_08,P_0_wv(1:3);
-    0,0,0,1];
+% P_8_wv = [-a_ee-a_wf,0,0,1]';
+% P_0_wv = T_08 * P_8_wv;
+% T_07_v = [R_08,P_0_wv(1:3);
+%     0,0,0,1];
 
 % 这里有虚拟腕关节，就可以采用SRS的方式
 len_vec_SE = sqrt(d_se^2+a_se^2);
@@ -78,6 +88,9 @@ gamma=gamma_down;
 % theta4 =theta4_up;
 theta4 =theta4_down;
 
+% 计算臂型角
+vec_h = vec_d_hat*(vec_d_hat'*vec)
+
 
 %表示x4
 R_41 = eye(3)+sin(-gamma)*vecToLieAlgebra(z4_hat)+(1-cos(-gamma))*vecToLieAlgebra(z4_hat)^2;
@@ -116,21 +129,24 @@ A4=modified_DH_transform(theta4,0,a_se,-pi/2);
 T_04 = A1*A2*A3*A4;
 
 %这种方法下，前6个关节都是没问题的，7是虚拟的转轴
-T_47v = (T_04)\T_07_v;
-R_47v = T_47v(1:3,1:3);
-theta6 = asin(-R_47v(2,3));
-theta7v = atan(-R_47v(2,2)/R_47v(2,1));
-theta5 =atan(R_47v(3,3)/R_47v(1,3));
+T_46 = (T_04)\T_06;
+R_46 = T_46(1:3,1:3);
+theta5=asin(R_46(1,3));
+theta6=asin(R_46(2,2));
+% theta6 = asin(-R_46(2,3));
+% theta7v = atan(-R_47v(2,2)/R_47v(2,1));
+% theta5 =atan(R_47v(3,3)/R_47v(1,3));
 
 A5=modified_DH_transform(theta5,d_ew,0,pi/2);
 A6=modified_DH_transform(theta6+pi/2,0,0,pi/2);
 
-T_06 = T_04*A5*A6;
-T_67 = (T_06)\T_07;
+% T_06 = T_04*A5*A6;
+% T_67 =A7;
+% T_67 = (T_06)\T_07;
 
 % 根据A7=T_67,可以求出
-theta7a = asin(T_67(3,1));
-theta7 = theta7a;
+% theta7a = asin(T_67(3,1));
+% theta7 = theta7a;
 
 % 上面的theta7a可能会超角度限制，需要进一步验算
 
@@ -185,7 +201,7 @@ delta3 = norm(vec_ED)-l_m30;
 theta = [theta1,theta2,theta3,delta1,theta5,delta2,delta3];
 
 % 计算臂型角
-vec_h = vec_d_hat*dot(vec_d_hat,vec)
+% vec_h = vec_d_hat*dot(vec_d_hat,vec)
 
 
 end
