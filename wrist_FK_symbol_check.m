@@ -6,6 +6,11 @@ clear
 % 基本参数
 a_wf = 12;   % 赋值示例
 ax = 0;     ay = -31;    az = -150.3;
+<<<<<<< HEAD
+=======
+
+% c 和 d都是在7系下固定的点的坐标，所以这里不会变
+>>>>>>> 目前还没完成验算，FK_syb_check不一定正确，现在转到PC中用mathmatica进行验算测试
 cx = -12;     cy = 28;     cz = 19;
 dx = -12;     dy = -28;     dz = 19;
 
@@ -16,6 +21,7 @@ bx = ax;    by = -ay;   bz = az;
 theta6 = pi/4;  % 赋值示例
 theta7 = pi/6;
 
+<<<<<<< HEAD
 %% 计算 l1^2 和 l2^2
 % -------------------- l1^2 --------------------
 l1_sq = a_wf^2 + ax^2 + ay^2 + az^2 + cx^2 + cy^2 + cz^2 ...
@@ -83,3 +89,103 @@ l1_sq_simplified = constant_term + theta6_term + theta7_term + ax_cross_term + c
 
 
 fprintf('化简后的 l1^2 = %.4f\n', l1_sq_simplified);
+=======
+
+
+
+%% 这个是正确的
+l1_sq_sym = ax^2 + ay^2 + az^2 + cx^2 + cy^2 + cz^2 + ...
+    2*ay*cy*cos(theta7) + a_wf^2 + 2*ay*cx*sin(theta7) + ...
+    2*a_wf*(-az*cos(theta6) + cx*cos(theta7) + ax*sin(theta6) - ...
+    cy*sin(theta7)) - ...
+    2*sin(theta6)*(az*cz - ax*cx*cos(theta7) + ax*cy*sin(theta7)) - ...
+    2*cos(theta6)*(ax*cz + az*cx*cos(theta7) - az*cy*sin(theta7))
+
+%% 这个是正确的
+l2_sq_sym = bx^2 + by^2 + bz^2 + dx^2 + dy^2 + dz^2 + ...
+    2*by*dy*cos(theta7) + a_wf^2 + 2*by*dx*sin(theta7) + ...
+    2*a_wf*(-bz*cos(theta6) + dx*cos(theta7) + bx*sin(theta6) - ...
+    dy*sin(theta7)) - ...
+    2*sin(theta6)*(bz*dz - bx*dx*cos(theta7) + bx*dy*sin(theta7)) - ...
+    2*cos(theta6)*(bx*dz + bz*dx*cos(theta7) - bz*dy*sin(theta7))
+
+%% 这里是正确的表达式
+% l1SqPlusl2Sq 表达式
+l1SqPlusl2Sq = 2*ax^2 + 2*ay^2 + 2*az^2 + cx^2 + cy^2 + cz^2 + dx^2 + dy^2 + dz^2 + ...
+    2*ay*(cy - dy)*cos(theta7) + 2*a_wf^2 + ...
+    2*(cx + dx)*cos(theta7).*(-az*cos(theta6) + ax*sin(theta6)) - ...
+    2*(cz + dz)*(ax*cos(theta6) + az*sin(theta6)) + ...
+    2*(ay*(cx - dx) + (cy + dy).*(az*cos(theta6) - ax*sin(theta6))).*sin(theta7) + ...
+    2*a_wf*(-2*az*cos(theta6) + (cx + dx)*cos(theta7) + 2*ax*sin(theta6) - (cy + dy)*sin(theta7))
+
+% l1SqMinul2Sq 表达式  
+l1SqMinul2Sq = cx^2 + cy^2 + cz^2 - dx^2 - dy^2 - dz^2 + ...
+    2*ay*(cy + dy)*cos(theta7) + ...
+    2*az*(-cx + dx).*cos(theta6).*cos(theta7) + ...
+    2*(cx - dx)*cos(theta7).*(a_wf + ax*sin(theta6)) - ...
+    2*(cz - dz)*(ax*cos(theta6) + az*sin(theta6)) + ...
+    2*(ay*(cx + dx) + az*(cy - dy).*cos(theta6) - (cy - dy).*(a_wf + ax*sin(theta6))).*sin(theta7)
+
+%% 进一步符号简写  这个是正确的
+% =============== 根据用户定义系数公式 ===============
+G1 = 2*ax^2 + 2*ay^2 + 2*az^2 + cx^2 + cy^2 + cz^2 + dx^2 + dy^2 + dz^2 + 2*a_wf^2;  % 绝对常数项
+
+G2 = -2*az*cz - 2*az*dz + 4*ax*a_wf;       % sin(theta6)系数
+G3 = -2*ax*cz - 2*ax*dz - 4*az*a_wf;       % cos(theta6)系数
+
+G4 = +2*ay*cx - 2*ay*dx - 2*cy*a_wf - 2*dy*a_wf;  % sin(theta7)系数  消掉了
+G5 = +2*ay*cy - 2*ay*dy + 2*cx*a_wf + 2*dx*a_wf;  % cos(theta7)系数
+
+G6 = -2*az*cx - 2*az*dx;                   % cos(theta6)cos(theta7)系数
+G7 = +2*ax*cx + 2*ax*dx;                   % sin(theta6)cos(theta7)系数 消掉了
+G8 = +2*az*cy + 2*az*dy;                   % cos(theta6)sin(theta7)系数 消掉了
+G9 = -2*ax*cy - 2*ax*dy;                   % sin(theta6)sin(theta7)系数 消掉了
+
+l1SqPlusl2Sq2 = ...
+    G1 + ...                                           % 常数项基座
+    G2 * sin(theta6) + G3 * cos(theta6) + ...          % theta6单独作用项
+    G4 * sin(theta7) + G5 * cos(theta7) + ...          % theta7单独作用项
+    G6 * cos(theta6)*cos(theta7) + ...                 % theta6-theta7混合项
+    G7 * sin(theta6)*cos(theta7) + ...
+    G8 * cos(theta6)*sin(theta7) + ...
+    G9 * sin(theta6)*sin(theta7);
+
+%% 进一步整理 这个是正确的
+% =============== 基础常数项 ===============
+H1 = cx^2 + cy^2 + cz^2 - dx^2 - dy^2 - dz^2; %消掉了
+
+% =============== theta6相关项 ===============
+H2 = -2*az*cz + 2*az*dz;      % sin(theta6)系数 消掉了
+H3 = -2*ax*cz + 2*ax*dz;      % cos(theta6)系数 消掉了
+
+% =============== theta7相关项 ===============
+H4 = +2*ay*cx + 2*ay*dx - 2*cy*a_wf + 2*dy*a_wf;  % sin(theta7)系数
+H5 = +2*ay*cy + 2*ay*dy + 2*cx*a_wf - 2*dx*a_wf;  % cos(theta7)系数 消掉了
+
+% =============== theta6-theta7混合项 ===============
+H6 = -2*az*cx + 2*az*dx;      % cos(theta6)cos(theta7)系数 消掉了
+H7 = +2*ax*cx - 2*ax*dx;      % sin(theta6)cos(theta7)系数 消掉了
+H8 = +2*az*cy - 2*az*dy;      % cos(theta6)sin(theta7)系数
+H9 = -2*ax*cy + 2*ax*dy;      % sin(theta6)sin(theta7)系数 消掉了
+
+L1SqMinuL2Sq2 = ...
+    H1 + ...                                       % 基础常数项
+    H2*sin(theta6) + H3*cos(theta6) + ...          % theta6单独作用项
+    H4*sin(theta7) + H5*cos(theta7) + ...          % theta7单独作用项
+    H6*cos(theta6).*cos(theta7) + ...              % theta6-theta7混合项
+    H7*sin(theta6).*cos(theta7) + ...
+    H8*cos(theta6).*sin(theta7) + ...
+    H9*sin(theta6).*sin(theta7);
+
+%% 对l1SqPlusl2SqSorted 和 L1SqMinuL2SqSorted 进一步化简，消除0项 正确的
+l1SqPlusl2SqSorted = ...
+    G1 + ...                                           
+    G2 * sin(theta6) + G3 * cos(theta6) + ...           
+    G5 * cos(theta7) + ...                             
+    G6 * cos(theta6)*cos(theta7)                       
+
+l1SqMinuL2SqSorted = ...
+    H4*sin(theta7) +  ...          
+    H8*cos(theta6).*sin(theta7) 
+
+>>>>>>> 目前还没完成验算，FK_syb_check不一定正确，现在转到PC中用mathmatica进行验算测试

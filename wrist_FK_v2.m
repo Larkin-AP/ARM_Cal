@@ -8,6 +8,11 @@ clear
 
 a_wf = 12;   % 赋值示例
 ax = 0;     ay = -31;    az = -150.3;
+<<<<<<< HEAD
+=======
+
+% cx cy cz 这个是在7系下固定的，不会变
+>>>>>>> 目前还没完成验算，FK_syb_check不一定正确，现在转到PC中用mathmatica进行验算测试
 cx = -12;     cy = 28;     cz = 19;
 dx = -12;     dy = -28;     dz = 19;
 
@@ -63,8 +68,13 @@ l2_sq = (norm(P_5D(1:3) - P_5B(1:3)))^2
 % l1_sq = simplify(l1_sq);
 % l2_sq = simplify(l2_sq);
 
+<<<<<<< HEAD
 % l1_plus_l2_sq = l1_sq + l2_sq;
 % l1_minu_l2_sq = l1_sq - l2_sq;
+=======
+l1_plus_l2_sq = l1_sq + l2_sq
+l1_minu_l2_sq = l1_sq - l2_sq
+>>>>>>> 目前还没完成验算，FK_syb_check不一定正确，现在转到PC中用mathmatica进行验算测试
 % 
 % l1_plus_l2_sq = simplify(l1_plus_l2_sq);
 % l1_minu_l2_sq = simplify(l1_minu_l2_sq);
