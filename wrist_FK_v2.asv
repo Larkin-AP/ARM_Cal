@@ -1,0 +1,31 @@
+%% 日期4.25重新开始尝试完成正解，采用坐标变换完整消除的方式试试看
+
+
+%% 以手腕关节的图为准
+% 坐标系5的朝向与手腕基座的朝向一致。
+clc
+
+syms theta6 theta7 a_wf ax ay az bx by bz cx cy cz dx dy dz real
+
+% 首先计算 T_57
+A6=modified_DH_transform(theta6+pi/2,0,0,pi/2);
+A7=modified_DH_transform(theta7,0,a_wf,pi/2);
+T_57  = A6*A7;
+
+% A,B 点在5系下的坐标，与基坐标系固定
+P_5A = [ax, ay, az,1]';
+P_5B = [bx, by, bz,1]';
+
+% C D 在7系下的坐标是固定的，且已知
+P_7C = [cx, cy, cz,1]';
+P_7D = [dx, dy, dz,1]';
+
+% 把C D 转到5系下
+P_5C = T_57*P_7C;
+P_5D = T_57*P_7D;
+
+% 约束方程
+l1 = norm(P_5C(:3)-P_5A(:3))
+l2 = norm(P_5D[:3]-P_5B[:3])
+
+
