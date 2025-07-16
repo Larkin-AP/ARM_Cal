@@ -6,11 +6,10 @@ clear
 % 基本参数
 a_wf = 12;   % 赋值示例
 ax = 0;     ay = -31;    az = -150.3;
-<<<<<<< HEAD
-=======
+
 
 % c 和 d都是在7系下固定的点的坐标，所以这里不会变
->>>>>>> 目前还没完成验算，FK_syb_check不一定正确，现在转到PC中用mathmatica进行验算测试
+
 cx = -12;     cy = 28;     cz = 19;
 dx = -12;     dy = -28;     dz = 19;
 
@@ -21,7 +20,7 @@ bx = ax;    by = -ay;   bz = az;
 theta6 = pi/4;  % 赋值示例
 theta7 = pi/6;
 
-<<<<<<< HEAD
+
 %% 计算 l1^2 和 l2^2
 % -------------------- l1^2 --------------------
 l1_sq = a_wf^2 + ax^2 + ay^2 + az^2 + cx^2 + cy^2 + cz^2 ...
@@ -89,7 +88,7 @@ l1_sq_simplified = constant_term + theta6_term + theta7_term + ax_cross_term + c
 
 
 fprintf('化简后的 l1^2 = %.4f\n', l1_sq_simplified);
-=======
+
 
 
 
@@ -188,4 +187,4 @@ l1SqMinuL2SqSorted = ...
     H4*sin(theta7) +  ...          
     H8*cos(theta6).*sin(theta7) 
 
->>>>>>> 目前还没完成验算，FK_syb_check不一定正确，现在转到PC中用mathmatica进行验算测试
+
