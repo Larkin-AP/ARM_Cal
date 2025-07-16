@@ -1,0 +1,73 @@
+% temp_cal
+clear 
+clc;
+syms theta1 theta2 d_bs d_se d_ew theta4 a_se x_0_sw_real real
+
+% d_bs = 0.1583;
+% d_se = 0.3596;
+% d_ew = 0.2569;
+% a_se = 0.009;
+% 
+% theta4 = 0.2017;
+% theta2 = 0;
+% theta1 = 0;
+
+A1=modified_DH_transform(theta1+pi/2,d_bs,0,0);
+A2=modified_DH_transform(theta2-pi/2,0,0,pi/2);
+A3=modified_DH_transform(0+pi/2,d_se,0,pi/2);
+A4=modified_DH_transform(theta4,0,a_se,-pi/2);
+R_34 = A4(1:3,1:3);
+% T_03 = A1*A2*A3;
+% R_03 = T_03(1:3,1:3);
+
+A_03_orig = simplify( A1*A2*A3);
+% A_03_orig = ( A1*A2*A3);
+vec_l_3_se = [a_se,0,d_se]';
+vec_l_4_ew = [0,-d_ew, 0 ]';
+R_03_orig = A_03_orig(1:3,1:3);
+x_0_sw = R_03_orig *(vec_l_3_se +R_34 *vec_l_4_ew);
+
+
+c1 = x_0_sw (1)
+c2 = x_0_sw (2)
+c3 = x_0_sw (3)
+
+
+sin_theta2= c3/((d_se - d_ew*cos(theta4)))
+cos_theta2_1 =  sqrt(1- sin(theta2)^2); % 要讨论多解
+cos_theta2_2 =  -sqrt(1- sin(theta2)^2); 
+theta2_1 = atan2 (sin_theta2,cos_theta2_1)
+theta2_2 = atan2 (sin_theta2,cos_theta2_2)
+% if theta2_1 > theta2_2
+%     theta2 = theta2_2;
+% else
+%     theta2 = theta2_1;
+% end
+
+% if theta2> 0 
+%     print("theta2 > 0, error!!!")
+% end
+% x = sin (theta1) y = cos(theta1)
+x = sin(theta1);
+y = cos(theta1);
+
+
+a1 = - cos(theta2)*(d_se - d_ew*cos(theta4));
+b1 = d_ew*sin(theta4);
+
+a2 = d_ew*sin(theta4);
+b2 = cos(theta2)*(d_se - d_ew*cos(theta4));
+
+D = a1*b2 -a2*b1;
+% if D != 0
+%     x = (c1*b2-c2*b1) / D
+%     y = (a1*c2-a2*c1) / D
+% 
+% end
+% % 还需要验证约束
+% check :
+%     x^2 + y^2 =1?  （可能无解）
+% 
+% 如果D = 0 （无解 或者无穷解）
+
+
